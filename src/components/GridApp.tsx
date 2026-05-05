@@ -8,6 +8,7 @@ import type { Block } from "@/lib/types";
 import { GridCanvas } from "./GridCanvas";
 import { LeaderboardPanel } from "./LeaderboardPanel";
 import { RegisterPanel } from "./RegisterPanel";
+import { motion, AnimatePresence } from "framer-motion";
 
 const THROTTLE_MS = 500;
 
@@ -256,6 +257,7 @@ export function GridApp() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 lg:flex-row lg:items-start">
       <div className="flex flex-1 flex-col items-center gap-4">
+        {/* Status badges */}
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
           <span
             className={`rounded-full px-2 py-0.5 font-medium ${
@@ -265,12 +267,11 @@ export function GridApp() {
             {connected ? "Live" : "Connecting…"}
           </span>
           {user?.isGuest && (
-            <span className="rounded-full bg-amber-900/30 px-2 py-0.5 font-medium text-amber-300">
-              Guest
-            </span>
+            <span className="rounded-full bg-amber-900/30 px-2 py-0.5 font-medium text-amber-300">Guest</span>
           )}
           {!bootstrapped ? <span>Loading grid…</span> : <span>{Object.keys(blocksById).length} blocks</span>}
         </div>
+
         <GridCanvas
           gridSize={gridSize}
           blocksById={blocksById}
@@ -280,12 +281,26 @@ export function GridApp() {
           onPickBlock={onPickBlock}
           onUnclaimBlock={onUnclaimBlock}
         />
-        {toast ? (
-          <div className="max-w-md rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-center text-sm text-slate-100 shadow">
-            {toast}
-          </div>
-        ) : null}
+
+        {/* Animated toast */}
+        <div className="h-9">
+          <AnimatePresence mode="wait">
+            {toast && (
+              <motion.div
+                key={toast}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+                className="max-w-md rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-center text-sm text-slate-100 shadow"
+              >
+                {toast}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
+
       <aside className="w-full shrink-0 space-y-4 lg:w-80">
         <RegisterPanel />
         <LeaderboardPanel />

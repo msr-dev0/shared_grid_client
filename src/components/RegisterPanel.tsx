@@ -4,6 +4,7 @@ import { useState } from "react";
 import { registerUser, syncAuthHeader } from "@/lib/api";
 import { useGridStore } from "@/lib/store";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const PRESETS = ["#22c55e", "#3b82f6", "#eab308", "#a855f7", "#f97316", "#ec4899", "#14b8a6", "#ef4444"];
 
@@ -20,7 +21,12 @@ export function RegisterPanel() {
   // ── Registered user: show identity card ──
   if (user && !user.isGuest) {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-200">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-200"
+      >
         <div className="font-medium text-white">Playing as</div>
         <div className="mt-2 flex items-center gap-2">
           <span
@@ -31,7 +37,7 @@ export function RegisterPanel() {
           <span className="font-semibold">{user.name}</span>
         </div>
         <div className="mt-1 text-slate-400">Score (blocks owned): {user.score}</div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -41,20 +47,10 @@ export function RegisterPanel() {
     setLoading(true);
     try {
       const trimmedName = name.trim();
-      if (!trimmedName) {
-        setToast("Please enter a display name");
-        return;
-      }
-      if (password.length < 6) {
-        setToast("Password must be at least 6 characters");
-        return;
-      }
+      if (!trimmedName) { setToast("Please enter a display name"); return; }
+      if (password.length < 6) { setToast("Password must be at least 6 characters"); return; }
       const normalizedColor = color.trim().toLowerCase();
-      const registered = await registerUser({
-        name: trimmedName,
-        color: normalizedColor,
-        password,
-      });
+      const registered = await registerUser({ name: trimmedName, color: normalizedColor, password });
       persistSession(registered);
       syncAuthHeader();
       setToast("Registered! Your blocks are saved permanently.");
@@ -66,8 +62,11 @@ export function RegisterPanel() {
   };
 
   return (
-    <form
+    <motion.form
       onSubmit={onSubmit}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
       className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-200"
     >
       <div className="font-medium text-white">
@@ -82,7 +81,7 @@ export function RegisterPanel() {
       <label className="mt-3 block">
         <span className="text-xs uppercase tracking-wide text-slate-500">Display name</span>
         <input
-          className="mt-1 w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-white outline-none ring-emerald-500/40 focus:ring-2"
+          className="mt-1 w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-white outline-none ring-emerald-500/40 focus:ring-2 transition-shadow"
           value={name}
           onChange={(e) => setName(e.target.value)}
           maxLength={64}
@@ -95,7 +94,7 @@ export function RegisterPanel() {
         <span className="text-xs uppercase tracking-wide text-slate-500">Password</span>
         <input
           type="password"
-          className="mt-1 w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-white outline-none ring-emerald-500/40 focus:ring-2"
+          className="mt-1 w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-white outline-none ring-emerald-500/40 focus:ring-2 transition-shadow"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           minLength={6}
@@ -108,12 +107,13 @@ export function RegisterPanel() {
         <span className="text-xs uppercase tracking-wide text-slate-500">Color</span>
         <div className="mt-2 flex flex-wrap gap-2">
           {PRESETS.map((c) => (
-            <button
+            <motion.button
               key={c}
               type="button"
-              className={`h-8 w-8 rounded-full border-2 transition-transform hover:scale-110 ${color === c ? "border-white scale-110" : "border-transparent"}`}
+              className={`h-8 w-8 rounded-full border-2 transition-transform ${color === c ? "border-white scale-110" : "border-transparent hover:scale-105"}`}
               style={{ backgroundColor: c }}
               onClick={() => setColor(c)}
+              whileTap={{ scale: 0.9 }}
               aria-label={`Pick color ${c}`}
             />
           ))}
@@ -130,13 +130,15 @@ export function RegisterPanel() {
         </div>
       </div>
 
-      <button
+      <motion.button
         type="submit"
         disabled={loading}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
         className="mt-4 w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Saving…" : user?.isGuest ? "Register & upgrade" : "Save profile"}
-      </button>
+      </motion.button>
 
       {user?.isGuest && (
         <>
@@ -152,6 +154,6 @@ export function RegisterPanel() {
           </div>
         </>
       )}
-    </form>
+    </motion.form>
   );
 }
