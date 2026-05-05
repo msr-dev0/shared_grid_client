@@ -57,7 +57,7 @@ function inferGridSize(blocks: Block[]): number {
   return max || 1;
 }
 
-export const useGridStore = create<GridState>((set, _get) => ({
+export const useGridStore = create<GridState>((set) => ({
   user: null,
   blocksById: {},
   gridSize: 1,

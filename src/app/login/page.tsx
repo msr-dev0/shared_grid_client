@@ -97,7 +97,7 @@ export default function LoginPage() {
           </button>
 
           <div className="text-center text-sm text-slate-400">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/" className="font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
               Go to Grid
             </Link>
